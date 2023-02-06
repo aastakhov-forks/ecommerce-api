@@ -34,37 +34,24 @@ export class ProductsService {
     },
   ];
 
-  getAll() {
-    return this.products;
+  async getAll(): Promise<Array<Product>> {
+    return this.productModel.find().exec();
   }
 
-  getOne(id: string) {
-    return this.products.find((p) => p.id === id);
+  async getById(id: string): Promise<Product> {
+    return this.productModel.findById(id);
   }
 
-  create(product: CreateProductDto) {
-    return this.products.push({
-      id: Date.now().toString(),
-      ...product,
-    });
+  async create(product: CreateProductDto): Promise<Product> {
+    const created = new this.productModel(product);
+    return created.save();
   }
 
-  update(id: string, product: UpdateProductDTO) {
-    const index = this.products.findIndex((p) => p.id === id);
-
-    index >= 0
-      ? (this.products[index] = { id: this.products[index].id, ...product })
-      : this.products.push({
-          id: Date.now().toString(),
-          ...product,
-        });
-
-    return index
-      ? this.products[index]
-      : this.products[this.products.length - 1];
+  async update(id: string, product: UpdateProductDTO): Promise<Product> {
+    return this.productModel.findByIdAndUpdate(id, product, { new: true });
   }
 
-  remove(id: string) {
-    this.products.filter((p) => p.id !== id);
+  async remove(id: string): Promise<Product> {
+    return this.productModel.findByIdAndRemove(id);
   }
 }
